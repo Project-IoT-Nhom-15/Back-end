@@ -9,13 +9,13 @@ class UserController {
             const body = req.body;
 
             if(body.username == '' || !body.username)
-                return res.status(400).json({message: 'invalid input'});
+                return res.json({message: 'invalid input'});
 
             const user = await User.findOne({username: body.username});
-            if(!user) return res.status(404).json({message: 'username doesnot exist'});
+            if(!user) return res.json({message: 'username doesnot exist'});
 
             const validPwd = await bcrypt.compare(body.password, user.password);
-            if(!validPwd) return res.status(404).json({message: 'wrong password'});
+            if(!validPwd) return res.json({message: 'wrong password'});
 
             const accessToken = Util.generateAccessToken(user);
 
@@ -32,11 +32,11 @@ class UserController {
             const body = req.body;
             
             if(body.username == '' || !body.username)
-            return res.status(400).json({message: 'invalid input'});
+            return res.json({message: 'invalid input'});
 
             const usernameCheck = await User.findOne({username: body.username});
             if(usernameCheck)
-                return res.status(400).json({message: 'username existed'});
+                return res.json({message: 'username existed'});
 
             const hashedPwd = await Util.hashPwd(body.password);
             
@@ -47,7 +47,7 @@ class UserController {
                 name: body.name,
             });
 
-            if(!user) return res.status(400).json({message: 'cannot create user'});
+            if(!user) return res.json({message: 'cannot create user'});
 
             return res.json(new UserDTO(user));
         }catch(err){
