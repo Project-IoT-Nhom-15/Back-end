@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
+const BCRYPT_SALT = parseInt(process.env.BCRYPT_SALT);
 
 const Util = {
     generateAccessToken: (data) => {
@@ -11,9 +12,9 @@ const Util = {
         }, process.env.ACCESS_SECRET_KEY, { expiresIn: "3d" });
     },
 
-    hashPwd: (pwd) => {
-        const salt = bcrypt.genSalt(process.env.BCRYPT_SALT);
-        return bcrypt.hash(pwd, salt);
+    hashPwd : async (pwd) => {
+        const salt = await bcrypt.genSalt(BCRYPT_SALT);
+        return await bcrypt.hash(pwd, salt);
     }
 
 }
