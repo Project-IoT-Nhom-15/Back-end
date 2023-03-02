@@ -18,14 +18,6 @@ class UserController {
             if(!validPwd) return res.status(404).json({message: 'wrong password'});
 
             const accessToken = Util.generateAccessToken(user);
-            const refreshToken = Util.generateRefreshToken(user);
-
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                secure: false, // true if in deployment env
-                path: '/',
-                sameSite: 'strict',
-            });
 
             return res.json({user: new UserDTO(user), accessToken});
 
@@ -66,6 +58,7 @@ class UserController {
 
     logout = (req, res) => {
         console.log('logout')
+        
         return res.json({message: 'logout'})
     }
 }
