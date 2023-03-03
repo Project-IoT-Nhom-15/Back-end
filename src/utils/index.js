@@ -6,10 +6,10 @@ const BCRYPT_SALT = parseInt(process.env.BCRYPT_SALT);
 const Util = {
     generateAccessToken: (data) => {
         return jwt.sign({
-            id: data._id,
+            _id: data._id,
             email: data.email,
             username: data.username,
-        }, process.env.ACCESS_SECRET_KEY, { expiresIn: "3d" });
+        }, process.env.ACCESS_SECRET_KEY, { expiresIn: "100d" });
     },
 
     hashPwd : async (pwd) => {
