@@ -1,8 +1,6 @@
 const System = require('../models/system');
 const Param = require('../models/param');
 const {User, UserDTO} = require('../models/user');
-const bcrypt = require('bcrypt')
-const Util = require('../utils')
 
 class UserController {
 
@@ -43,7 +41,7 @@ class UserController {
 
         }catch(err) {
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         }
     }
 
@@ -63,7 +61,7 @@ class UserController {
 
         }catch(err) {
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         }
     }
 
@@ -86,7 +84,7 @@ class UserController {
 
         }catch(err) {
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         }
     }
 
@@ -105,7 +103,7 @@ class UserController {
 
         }catch(err) {
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         }
     }
 
@@ -127,7 +125,7 @@ class UserController {
 
         }catch(err) {
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         }
     }
 }

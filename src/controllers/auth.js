@@ -23,7 +23,7 @@ class AuthController {
 
         }catch(err) {
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         } 
     }
 
@@ -45,6 +45,7 @@ class AuthController {
                 password: hashedPwd,
                 email: body.email,
                 name: body.name,
+                phone: body.phone
             });
 
             if(!user) return res.json({message: 'cannot create user'});
@@ -52,7 +53,7 @@ class AuthController {
             return res.json(new UserDTO(user));
         }catch(err){
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         }
     }
 
@@ -79,10 +80,10 @@ class AuthController {
 
             nUser = await User.findById(userID);
             return res.json(new UserDTO(nUser));
-            
+
         }catch(err){
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         }
     }
 }

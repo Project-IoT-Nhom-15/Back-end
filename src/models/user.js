@@ -12,6 +12,9 @@ const schema = new Schema(
         email: {
             type: String, required: true, trim: true
         },
+        phone: {
+            type: String, required: true, trim: true
+        },
         name: {
             type: String, required: true, trim: true
         }
@@ -28,6 +31,7 @@ class UserDTO {
     username;
     email;
     name;
+    phone;
     createdAt;
     updatedAt;
 
@@ -36,6 +40,7 @@ class UserDTO {
         this.email = user.email;
         this.username = user.username;
         this.name = user.name;
+        this.phone = user.phone;
         this.createdAt = user.createdAt;
         this.updatedAt = user.updatedAt;
     };
