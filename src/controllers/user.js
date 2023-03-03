@@ -17,6 +17,7 @@ class UserController {
     //     return res.json(d);
     // }
 
+
     getAllSystems = async(req, res) =>{
         try {
             const userID = req.user._id;
@@ -25,7 +26,7 @@ class UserController {
 
         }catch(err) {
             console.log(err);
-            return res.status(400).json({error: err.message});
+            return res.json({error: err.message});
         } 
     }
 
