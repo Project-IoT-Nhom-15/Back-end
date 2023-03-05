@@ -18,6 +18,7 @@ function getMQTTClient(){
 
 function use(){
     const client = this.getMQTTClient();
+    let warn = 0;
     const [DataTopic, StateTopic, CommandTopic] = [brokerInfo.DATA_TOPIC, brokerInfo.STATE_TOPIC, brokerInfo.COMMAND_TOPIC];
     
     client.on('connect', () => {
@@ -34,33 +35,34 @@ function use(){
             if(topic == DataTopic){
                 // Lấy dữ liệu
                 const data = JSON.parse(payload.toString())
+                console.log(data)
             
-                const sysID = + data['systemID']
-                const smoke = (+ data['smoke']).toFixed(2)
+                const sysID = data.deviceid;
+                const temp = (+ data['temperature']).toFixed(2)
                 const humid = (+ data['humidity']).toFixed(2)
                 const fire = + data['fire']
                 const gas = + data['gas']
                 console.log('------------------------------------')
-                console.log(`Recieve data from ${sysID}: \n\t- Smoke: \t${smoke}\n\t- Humidity: \t${humid}\n\t- Fire: \t${fire}\n\t- Gas: \t\t${gas}\n`);
+                console.log(`Recieve data from ${sysID}: \n\t- Temp: \t${temp}\n\t- Humidity: \t${humid}\n\t- Fire: \t${fire}\n\t- Gas: \t\t${gas}\n`);
             
                 // Đánh giá độ nguy hiểm theo độ ưu tiên fire > gas > temp and humi
                 var response = {};
                 response['type'] = "warning"
-                response['systemID'] = sysID
+                response['deviceid'] = sysID
             
-                if(humid < 45){
+                if(humid < 0){ //fix
                     response['hasHumid'] = 1
-                    response['danger'] = 1
+                    //response['danger'] = 1
                 }
                 else response['hasHumid'] = 0
             
-                if(smoke > 60){ // fix
-                    response['hasSmoke'] = 1
+                if(temp > 30){ // fix
+                    response['hasTemp'] = 1
                     response['danger'] = 1
                 }
-                else response['hasSmoke'] = 0
+                else response['hasTemp'] = 0
             
-                if(gas > 2375){
+                if(gas > 1200){
                     response['hasGas'] = 1
                     response['danger'] = 1
                 }
@@ -83,7 +85,7 @@ function use(){
                 console.log(response);
 
                 const nData = {
-                    fire: fire, smoke: smoke,
+                    fire: fire, temp: temp,
                     humid: humid, gas:gas, 
                     systemID: sysID, warning: response['danger'] == 1 ? true : false
                 }
@@ -91,7 +93,12 @@ function use(){
                 const param = await Param.create(nData);
                 if(!param) console.log('save data of params to database failed');
                 
-                if(response.danger == 1) await sendWarningMail(sysID)
+                
+                if(warn == 0 && response.danger == 1){
+                    await sendWarningMail(sysID);
+                    warn = 1;
+                }
+                else if(response.danger == 0) warn = 0;
             
                 // Gửi lại dữ liệu vào kênh command
                 client.publish(CommandTopic, JSON.stringify(response), {qos: 0, retain: false}, (error) => {
@@ -99,7 +106,7 @@ function use(){
                     console.error(error)
                 }
             
-                console.log(`Send result to topic ${CommandTopic}\n\t- Has fire: \t${response['hasFire']}\n\t- Has gas: \t${response['hasGas']}\n\t- Danger: \t${response['danger']}\n`);
+                console.log(`Send result to topic ${CommandTopic}\n\t- Has temp: \t${response['hasTemp']}\n\t- Has humid: \t${response['hasHumid']}\n\t- Has fire: \t${response['hasFire']}\n\t- Has gas: \t${response['hasGas']}\n\t- Danger: \t${response['danger']}\n`);
                 })
             }
             
@@ -116,7 +123,7 @@ function use(){
 
                 // Update vào db
                 const sys = await System.findOneAndUpdate({_id: sysID}, {state: newState});
-                if(!sys) console.log()
+                if(!sys) console.log("Update system state failed!");
 
             }
         } catch (error) {

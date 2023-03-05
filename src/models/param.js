@@ -6,7 +6,7 @@ const schema = new Schema(
         fire: {
             type: Number, required: true
         },
-        smoke: {
+        temp: {
             type: Number, required: true
         },
         humid: {

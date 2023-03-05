@@ -127,13 +127,13 @@ class UserController {
         try {
             const userID = req.user._id;
             const body = req.body;
-            delete body.password;
+            delete body.password, body._id;
 
             const user = new UserDTO(await User.findById(userID));
             if(!user)
                 return res.json({message: 'user does not exist'});
 
-            const nUser = await User.findOneAndUpdate({userID: userID}, body)
+            const nUser = await User.findOneAndUpdate({_id: userID}, body)
             if(!nUser) return res.json({message: 'update failed'});
 
             nUser = await User.findById(userID);

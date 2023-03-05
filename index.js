@@ -4,7 +4,8 @@ const route = require("./src/routes");
 const db = require("./database");
 const morgan = require("morgan");
 const mqtt = require('./mqtt');
-const mailer = require('./mailer');
+const Param = require('./src/models/param')
+const cron = require('node-cron');
 
 const app = express();
 const PORT = process.env.PORT || 9999;
@@ -24,6 +25,18 @@ mqtt.use();
 //     if(err) throw err
 //     console.log('Send mail: ', info.response);
 // })
+// Đặt lịch xóa dữ liệu ngày hôm trước vào đúng 0h sáng mỗi ngày
+const task = cron.schedule('0-59 * * * *', async () =>  {
+    await Param.deleteMany({}, (err)=>{
+        if(!err) console.log('Delete Success!!!!!!!!!!!!!!!!!!');
+        else console.log('delete failed!!!!!!!!!!!!!!!!!!!!!');
+    });
+
+  }, {
+    scheduled: true
+  });
+  
+task.start()
 
 app.use(express.urlencoded({extended: true})); // for parsing application/x-www-form-urlencoded
 app.use(express.json());  // for parsing application/json
