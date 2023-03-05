@@ -72,10 +72,12 @@ class AuthController {
             if(!user)
                 return res.json({message: 'user does not exist'});
 
-            if(!nPw || oPw !== user.password)
-                return res.json({message: 'wrong password'});
+            const validPwd = await bcrypt.compare(oPw, user.password);
+            if(!nPw || !validPwd) return res.json({message: 'wrong password'});
             
-            let nUser = await User.findOneAndUpdate({_id: userID}, {password: nPw});
+            const hashedNewPw = await Util.hashPwd(nPw); 
+
+            let nUser = await User.findOneAndUpdate({_id: userID}, {password: hashedNewPw});
             if(!nUser) return res.json({message: 'update password failed'})
 
             nUser = await User.findById(userID);

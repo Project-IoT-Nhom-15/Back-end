@@ -3,6 +3,8 @@ require("dotenv").config();
 const route = require("./src/routes");
 const db = require("./database");
 const morgan = require("morgan");
+const mqtt = require('./mqtt');
+const mailer = require('./mailer');
 
 const app = express();
 const PORT = process.env.PORT || 9999;
@@ -16,6 +18,12 @@ app.use(function (req, res, next) {
 })
 
 db.connect();
+mqtt.use();
+
+// mailer.sendEmail('trieuvipkute99@gmail.com', 'hello', 'dm', (err, info) =>{
+//     if(err) throw err
+//     console.log('Send mail: ', info.response);
+// })
 
 app.use(express.urlencoded({extended: true})); // for parsing application/x-www-form-urlencoded
 app.use(express.json());  // for parsing application/json

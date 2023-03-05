@@ -1,11 +1,8 @@
 const mongoose = require("mongoose");
+const db = require('../configs/db.config')
 require("dotenv").config();
 
-const DB_USER = process.env.DB_USER;
-const DB_PWD = process.env.DB_PWD;
-const DB_NAME = process.env.DB_NAME;
-
-const uri = `mongodb+srv://${DB_USER}:${DB_PWD}@cluster0.xdk8qqa.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${db.USER}:${db.PASSWORD}@cluster0.xdk8qqa.mongodb.net/${db.NAME}?retryWrites=true&w=majority`;
 
 async function connect(){
 

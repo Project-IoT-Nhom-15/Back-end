@@ -1,6 +1,8 @@
 const System = require('../models/system');
 const Param = require('../models/param');
 const {User, UserDTO} = require('../models/user');
+const mqtt = require('../../mqtt');
+const brokerInfo = require('../../configs/mqtt.config');
 
 class UserController {
 
@@ -73,8 +75,22 @@ class UserController {
 
             if(!system || system?.userID != userID) 
                 return res.json({message: 'you are not allowed to access'});
+
+            if(state != system.state){
+                const client = mqtt.getMQTTClient();
+                const message = {
+                    type: 'control',
+                    systemID: system._id,
+                    state: state
+                }
+                client.publish(brokerInfo.COMMAND_TOPIC, JSON.stringify(message), (err) => {
+                    if(err) console.error(err)
+                    
+                    console.log(message);
+                })
+            }
             
-            let nSystem = await System.findOneAndUpdate({_id: id}, {state: state, name: name});
+            let nSystem = await System.findOneAndUpdate({_id: id}, {name: name});
 
             if(!nSystem)
                 return res.json({message:'update failed'});

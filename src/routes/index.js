@@ -10,11 +10,11 @@ module.exports = function route(app){
 
     app.get('/logout', Authz.verifyToken, authController.logout);
 
-    app.get('/change-password', Authz.verifyToken, authController.changePassword);
+    app.post('/change-password', Authz.verifyToken, authController.changePassword);
 
     app.get('/user', Authz.verifyToken, userController.getProfile);
 
-    app.get('/update-profile', Authz.verifyToken, userController.updateProfile)
+    app.post('/update-profile', Authz.verifyToken, userController.updateProfile)
 
     app.get('/system/:id', Authz.verifyToken, userController.getSystem);
 
