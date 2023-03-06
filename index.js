@@ -18,13 +18,12 @@ app.use(function (req, res, next) {
     next();
 })
 
+// connect db mongo
 db.connect();
+
+// connect mqtt
 mqtt.use();
 
-// mailer.sendEmail('trieuvipkute99@gmail.com', 'hello', 'dm', (err, info) =>{
-//     if(err) throw err
-//     console.log('Send mail: ', info.response);
-// })
 // Đặt lịch xóa dữ liệu ngày hôm trước vào đúng 0h sáng mỗi ngày
 const task = cron.schedule('0-59 * * * *', async () =>  {
     await Param.deleteMany({}, (err)=>{
@@ -33,15 +32,15 @@ const task = cron.schedule('0-59 * * * *', async () =>  {
     });
 
   }, {
-    scheduled: true
+    scheduled: false,
   });
   
-task.start()
+// task.start()
 
 app.use(express.urlencoded({extended: true})); // for parsing application/x-www-form-urlencoded
 app.use(express.json());  // for parsing application/json
 
-app.use(morgan('combined'));
+// app.use(morgan('combined'));
 route(app);
 
 app.listen(PORT, ()=>{

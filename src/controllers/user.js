@@ -58,8 +58,8 @@ class UserController {
             else if(!system || system?.state == false)
                 return res.json({message: 'system is off now'});
             
-            const params = await Param.find({systemID: id}).limit(10);
-            return res.json(params);
+            const params = await Param.find({systemID: id}).sort({ createdAt: -1 }).limit(1);
+            return res.json(params[0]);
 
         }catch(err) {
             console.log(err);
@@ -67,28 +67,58 @@ class UserController {
         }
     }
 
-    controlSystem = async(req, res) => {
+    controlState = async(req, res) => {
         try {
-            const [id, state, name] = [req.params.id, req.query.state, req.query.name];
+            const id = req.params.id;
+            const state = req.query.state;
             const userID = req.user._id;
             const system = await System.findById(id);
 
             if(!system || system?.userID != userID) 
                 return res.json({message: 'you are not allowed to access'});
 
-            if(state != system.state){
+            // if(!state) state = system.state;
+            console.log(state,'--------------------', system.state)
+            if(state && state != system.state){
                 const client = mqtt.getMQTTClient();
                 const message = {
                     type: 'control',
-                    systemID: system._id,
-                    state: state
+                    deviceid: system._id.toString(),
+                    state: state,
                 }
-                client.publish(brokerInfo.COMMAND_TOPIC, JSON.stringify(message), (err) => {
+                client.publish(brokerInfo.COMMAND_TOPIC, JSON.stringify(message) ,{qos: 0, retain: false}, (err) => {
                     if(err) console.error(err)
                     
                     console.log(message);
                 })
+
+                // Update vào db
+                const sys = await System.findOneAndUpdate({_id: id}, {state: state});
+                if(!sys) console.log("Update system state failed!");
             }
+
+           
+            
+            return res.json('just changed state!');
+           
+
+        }catch(err) {
+            console.log(err);
+            return res.json({error: err.message});
+        }
+    }
+
+    changeSystemName = async(req, res) => {
+        try {
+            const [id, name] = [req.params.id, req.query.name];
+            const userID = req.user._id;
+            const system = await System.findById(id);
+
+            if(!system || system?.userID != userID) 
+                return res.json({message: 'you are not allowed to access'});
+
+            if(!name)
+                return res.json({message: 'missing param'});
             
             let nSystem = await System.findOneAndUpdate({_id: id}, {name: name});
 

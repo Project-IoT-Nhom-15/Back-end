@@ -7,7 +7,7 @@ const schema = new Schema(
             type: String, required: true, trim: true
         },
         state: {
-            type: String, required: true, trim: true, default: false
+            type: Number, required: true, trim: true, default: 0
         },
         userID: {
             type: Schema.Types.ObjectId, required: true, trim: true, ref: 'User'

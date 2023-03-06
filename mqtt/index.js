@@ -20,7 +20,7 @@ function use(){
     const client = this.getMQTTClient();
     let warn = 0;
     const [DataTopic, StateTopic, CommandTopic] = [brokerInfo.DATA_TOPIC, brokerInfo.STATE_TOPIC, brokerInfo.COMMAND_TOPIC];
-    
+    console.log('Kết nối!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     client.on('connect', () => {
         console.log(`Connected to Broker ${brokerInfo.HOST} port ${brokerInfo.PORT}`)
         client.subscribe([DataTopic, StateTopic], () => {
@@ -36,12 +36,13 @@ function use(){
                 // Lấy dữ liệu
                 const data = JSON.parse(payload.toString())
                 console.log(data)
-            
+                
+
                 const sysID = data.deviceid;
-                const temp = (+ data['temperature']).toFixed(2)
-                const humid = (+ data['humidity']).toFixed(2)
-                const fire = + data['fire']
-                const gas = + data['gas']
+                const temp = (+ data.temperature).toFixed(2)
+                const humid = (+ data.humidity).toFixed(2)
+                const fire = + data.fire
+                const gas = + data.gas
                 console.log('------------------------------------')
                 console.log(`Recieve data from ${sysID}: \n\t- Temp: \t${temp}\n\t- Humidity: \t${humid}\n\t- Fire: \t${fire}\n\t- Gas: \t\t${gas}\n`);
             
@@ -50,13 +51,13 @@ function use(){
                 response['type'] = "warning"
                 response['deviceid'] = sysID
             
-                if(humid < 0){ //fix
+                if(humid < 20){
                     response['hasHumid'] = 1
-                    //response['danger'] = 1
+                    response['danger'] = 1
                 }
                 else response['hasHumid'] = 0
             
-                if(temp > 30){ // fix
+                if(temp > 30){
                     response['hasTemp'] = 1
                     response['danger'] = 1
                 }
@@ -87,7 +88,7 @@ function use(){
                 const nData = {
                     fire: fire, temp: temp,
                     humid: humid, gas:gas, 
-                    systemID: sysID, warning: response['danger'] == 1 ? true : false
+                    systemID: sysID, warning: response.danger == 1 ? true : false
                 }
                 // Lưu dữ liệu vào db
                 const param = await Param.create(nData);
@@ -118,8 +119,8 @@ function use(){
             
                 // trạng thái mới của hệ thống
                 const newState = data.state
-                const sysID = + data.systemID
-                console.log(sysID, newState);
+                const sysID = data.deviceid
+                console.log(sysID, ' ---+++++---',  newState);
 
                 // Update vào db
                 const sys = await System.findOneAndUpdate({_id: sysID}, {state: newState});

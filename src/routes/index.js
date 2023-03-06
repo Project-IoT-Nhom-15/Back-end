@@ -21,9 +21,14 @@ module.exports = function route(app){
     app.get('/systems', Authz.verifyToken, userController.getAllSystems);
     // app.post('/create', userController.create);
     
+    
     app.get('/system-params/:id', Authz.verifyToken, userController.getParams);
 
-    app.get('/system-controls/:id', Authz.verifyToken, userController.controlSystem);
+    app.get('/system-state/:id', Authz.verifyToken, userController.controlState);
+
+    app.get('/system-name/:id', Authz.verifyToken, userController.changeSystemName);
+
+
 
 
 
